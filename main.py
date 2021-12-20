@@ -1,4 +1,11 @@
-# This is a very early version of the build. 
+import bookmanagement
 
-import GUI
-GUI
+def main():
+    cursor = bookmanagement.get_cursor()
+    bookmanagement.select_category(cursor)
+
+
+
+
+if __name__=='__main__':
+    main()
