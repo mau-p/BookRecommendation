@@ -2,7 +2,7 @@ import bookmanagement
 
 def main():
     cursor = bookmanagement.get_cursor()
-    bookmanagement.select_category(cursor)
+    bookmanagement.select_category(cursor, 'romantic')
 
 
 
