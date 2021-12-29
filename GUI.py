@@ -1,62 +1,157 @@
 import tkinter as tk
-from tkinter.constants import DISABLED
+from tkinter.constants import CENTER, DISABLED
+import questions
+
+global app
+
+# Basic properties for all windows
+class Window:
+    def __init__(self) -> None:
+        self.geometry = root.geometry("960x600")
+        self.previous = tk.Button(root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
+        self.quit = tk.Button(root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
+        self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
+        
+# The window that is displayed when the user first launches the program
+class IntroWindow(Window):
+    def __init__(self) -> None:
+        Window.__init__(self)
+        self.text = tk.Label(root, text=("Welcome to Bookrecommendation! \n \n"
+                                         "This knowledge system uses expert knowledge to give you a book recommendation. \n"
+                                         "Developed by Matthew Melcherts, Maurits Merks and Julius Wagenbach. \n"))
+        self.text.place(relx=.5, rely=.3, anchor=CENTER)
+        self.previous = tk.Button(root, text="Previous", state=DISABLED)
+        self.previous.place(relx=.1, rely=.9)
+
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+
+
+# Type of window that asks the user for value (for example their age or a book rating)
+class IntegerWindow(Window):
+    def __init__(self, question: str) -> None:
+        Window.__init__(self)
+        self.text = tk.Label(root, text=question)
+        self.text.place(relx=.5, rely=.3, anchor=CENTER)
+        self.entry = tk.Entry(root, width=3)
+        self.entry.place(relx=.5, rely=.5, anchor=CENTER)
+
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        self.entry.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        question.answer = self.entry.get()
+
+    # Retrieves index of previous question, and makes a window depending on type  
+    def previous_question(self):
+        global app
+        self.text.place_forget()
+        self.entry.place_forget()
+        question = questions.get_previous_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        if question.answer_type == "welcome":
+            app = IntroWindow()
+
+# Type of window that shows the user different options to choose from (for example gender, yes/no or reading preferences)
+class CategoryWindow(Window):
+    def __init__(self, question: str, categories: list) -> None:
+        Window.__init__(self)
+        self.text = tk.Label(root, text=question)
+        self.text.place(relx=0.5, rely=.3, anchor=CENTER)
+        self.categories = categories
+        self.category_variables = []
+        self.boxes = []
+        self.set_category_variables()
+        self.create_checkboxes()
+        self.place_checkboxes()
+
+    # Creates an tk.IntVar for each variable, (gets set to 1 if checked)
+    def set_category_variables(self):
+        for i in range(len(self.categories)):
+            self.category_variables.append(tk.IntVar())
+
+    def create_checkboxes(self):
+        for category, category_variable in zip(self.categories, self.category_variables):
+            self.boxes.append(tk.Checkbutton(
+                root, text=category, variable=category_variable))
+
+    # This is terrible, but havent found a better way for now
+    def place_checkboxes(self):
+        if len(self.boxes) == 2:
+            self.boxes[0].place(relx=.40, rely=.5)
+            self.boxes[1].place(relx=.60, rely=.5)
+        elif len(self.boxes) == 3:
+            self.boxes[0].place(relx=.35, rely=.5)
+            self.boxes[1].place(relx=.45, rely=.5)
+            self.boxes[2].place(relx=.55, rely=.5)
+        elif len(self.boxes) == 4:
+            self.boxes[0].place(relx=.20, rely=.5)
+            self.boxes[1].place(relx=.40, rely=.5)
+            self.boxes[2].place(relx=.60, rely=.5)
+            self.boxes[3].place(relx=.80, rely=.5)
+        elif len(self.boxes) == 8:
+            self.boxes[0].place(relx=.20, rely=.5)
+            self.boxes[1].place(relx=.40, rely=.5)
+            self.boxes[2].place(relx=.60, rely=.5)
+            self.boxes[3].place(relx=.80, rely=.5)
+            self.boxes[4].place(relx=.20, rely=.6)
+            self.boxes[5].place(relx=.40, rely=.6)
+            self.boxes[6].place(relx=.60, rely=.6)
+            self.boxes[7].place(relx=.80, rely=.6)
+
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        for box in self.boxes:
+            box.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        self.store_result(question)
+    
+    # Retrieves index of previous question, and makes a window depending on type
+    def previous_question(self):
+        global app
+        self.text.place_forget()
+        for box in self.boxes:
+            box.place_forget()
+        question = questions.get_previous_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        if question.answer_type == "welcome":
+            app = IntroWindow()
+
+    # Goes through each of the box variables, if it is 1 (True), it appends the corresponding category to the result.
+    def store_result(self, question):
+        results = []
+        for i in range(len(self.category_variables)):
+            if self.category_variables[i].get() == 1:
+                results.append(self.categories[i])
+        question.answer = results
+        
 
 root = tk.Tk()
-root.title("Bookrecommendation")
-
-root.grid()
-root.geometry('960x600')
-
-text0 = ("Welcome to Bookrecommendation! \n \n"
-"This knowledge system uses expert knowledge to give you a book recommendation. \n"
-"Developed by Matthew Melcherts, Maurits Merks and Julius Wagenbach. \n")
-text1 = ("How old are you?")
-text2 = ("What is your gender?")
-text3 = ("What is your reading level?")
-text4 = ("text4")
-
-text = tk.Label(root, text=text0)
-text.place(relx=.5, rely=.3, anchor='center')
-
-progress_list = [text0, text1, text2, text3, text4]
-
-def place_buttons():
-    text.place(relx=.5, rely=.3, anchor='center')
-    button_previous.place(relx=.1, rely=.9, anchor='center')
-    button_next.place(relx=.9, rely=.9, anchor='center')
-
-def previous(progress_number):
-    global text
-    global button_previous
-    global button_next
-
-    text.grid_forget()
-    text = tk.Label(root, text=progress_list[progress_number-1])
-    button_previous = tk.Button(root, text="Previous", command=lambda: previous(progress_number-1))
-    button_next = tk.Button(root, text="Next", command=lambda: next(progress_number+1))
-
-    if progress_number == 1:
-        button_previous = tk.Button(root, text="Previous", state=DISABLED)
-    
-    place_buttons()
-
-def next(progress_number):
-    global text
-    global button_previous
-    global button_next
-
-    text.place_forget()
-    text = tk.Label(root, text=progress_list[progress_number-1])
-    button_previous = tk.Button(root, text="Previous", command=lambda: previous(progress_number-1))
-    button_next = tk.Button(root, text="Next", command=lambda: next(progress_number+1))
-
-    if progress_number == len(progress_list):
-        button_next = tk.Button(root, text="Next", state=DISABLED)
-
-    place_buttons()
-
-button_previous = tk.Button(root, text="Previous", command=previous, state=DISABLED).place(relx=.1, rely=.9, anchor='center')
-button_quit = tk.Button(root, text="Quit", command=root.quit).place(relx=.5, rely=.9, anchor='center')
-button_next = tk.Button(root, text="Next", command=lambda: next(2)).place(relx=.9, rely=.9, anchor='center')
-
+root.title("Book Recommendation")
+app = IntroWindow()
 root.mainloop()
