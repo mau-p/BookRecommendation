@@ -1,15 +1,17 @@
 import tkinter as tk
 from tkinter.constants import CENTER, DISABLED
+import questions
+
+global app
 
 # Basic properties for all windows
 class Window:
     def __init__(self) -> None:
         self.geometry = root.geometry("960x600")
-        self.previous = tk.Button(root, text="Previous")
-        self.next = tk.Button(root, text="Next")
-        self.previous.place(relx=.1, rely=.9)
-        self.next.place(relx=.85, rely=.9)
-
+        self.previous = tk.Button(root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
+        self.quit = tk.Button(root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
+        self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
+        
 # The window that is displayed when the user first launches the program
 class IntroWindow(Window):
     def __init__(self) -> None:
@@ -21,6 +23,16 @@ class IntroWindow(Window):
         self.previous = tk.Button(root, text="Previous", state=DISABLED)
         self.previous.place(relx=.1, rely=.9)
 
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+
 
 # Type of window that asks the user for value (for example their age or a book rating)
 class IntegerWindow(Window):
@@ -31,6 +43,31 @@ class IntegerWindow(Window):
         self.entry = tk.Entry(root, width=3)
         self.entry.place(relx=.5, rely=.5, anchor=CENTER)
 
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        self.entry.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        question.answer = self.entry.get()
+
+    # Retrieves index of previous question, and makes a window depending on type  
+    def previous_question(self):
+        global app
+        self.text.place_forget()
+        self.entry.place_forget()
+        question = questions.get_previous_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        if question.answer_type == "welcome":
+            app = IntroWindow()
+
 # Type of window that shows the user different options to choose from (for example gender, yes/no or reading preferences)
 class CategoryWindow(Window):
     def __init__(self, question: str, categories: list) -> None:
@@ -38,10 +75,16 @@ class CategoryWindow(Window):
         self.text = tk.Label(root, text=question)
         self.text.place(relx=0.5, rely=.3, anchor=CENTER)
         self.categories = categories
-        self.category_variables = [tk.IntVar]*len(categories)
+        self.category_variables = []
         self.boxes = []
+        self.set_category_variables()
         self.create_checkboxes()
         self.place_checkboxes()
+
+    # Creates an tk.IntVar for each variable, (gets set to 1 if checked)
+    def set_category_variables(self):
+        for i in range(len(self.categories)):
+            self.category_variables.append(tk.IntVar())
 
     def create_checkboxes(self):
         for category, category_variable in zip(self.categories, self.category_variables):
@@ -57,6 +100,11 @@ class CategoryWindow(Window):
             self.boxes[0].place(relx=.35, rely=.5)
             self.boxes[1].place(relx=.45, rely=.5)
             self.boxes[2].place(relx=.55, rely=.5)
+        elif len(self.boxes) == 4:
+            self.boxes[0].place(relx=.20, rely=.5)
+            self.boxes[1].place(relx=.40, rely=.5)
+            self.boxes[2].place(relx=.60, rely=.5)
+            self.boxes[3].place(relx=.80, rely=.5)
         elif len(self.boxes) == 8:
             self.boxes[0].place(relx=.20, rely=.5)
             self.boxes[1].place(relx=.40, rely=.5)
@@ -67,6 +115,41 @@ class CategoryWindow(Window):
             self.boxes[6].place(relx=.60, rely=.6)
             self.boxes[7].place(relx=.80, rely=.6)
 
+    # Retrieves index of next question, and makes a window depending on type
+    def next_question(self):
+        global app
+        self.text.place_forget()
+        for box in self.boxes:
+            box.place_forget()
+        question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        self.store_result(question)
+    
+    # Retrieves index of previous question, and makes a window depending on type
+    def previous_question(self):
+        global app
+        self.text.place_forget()
+        for box in self.boxes:
+            box.place_forget()
+        question = questions.get_previous_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text, question.possible_answers)
+        if question.answer_type == "welcome":
+            app = IntroWindow()
+
+    # Goes through each of the box variables, if it is 1 (True), it appends the corresponding category to the result.
+    def store_result(self, question):
+        results = []
+        for i in range(len(self.category_variables)):
+            if self.category_variables[i].get() == 1:
+                results.append(self.categories[i])
+        question.answer = results
+        
 
 root = tk.Tk()
 root.title("Book Recommendation")

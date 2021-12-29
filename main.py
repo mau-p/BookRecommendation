@@ -1,9 +1,8 @@
 import bookmanagement
+import GUI
 
 def main():
-    cursor = bookmanagement.get_cursor()
-    bookmanagement.select_category(cursor, 'romantic')
-
+    GUI    
 
 
 
