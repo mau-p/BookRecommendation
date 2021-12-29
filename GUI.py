@@ -27,7 +27,7 @@ class IntroWindow(Window):
     def next_question(self):
         global app
         self.text.place_forget()
-        question = questions.get_next_question()
+        _,question = questions.get_next_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":
@@ -48,19 +48,20 @@ class IntegerWindow(Window):
         global app
         self.text.place_forget()
         self.entry.place_forget()
-        question = questions.get_next_question()
-        if question.answer_type == "value":
-            app = IntegerWindow(question.question_text)
-        if question.answer_type == "category":
-            app = CategoryWindow(question.question_text, question.possible_answers)
-        question.answer = self.entry.get()
+        current_question, next_question = questions.get_next_question()
+        if next_question.answer_type == "value":
+            app = IntegerWindow(next_question.question_text)
+        if next_question.answer_type == "category":
+            app = CategoryWindow(next_question.question_text, next_question.possible_answers)
+        current_question.answer = self.entry.get()
+        current_question.print_info()
 
     # Retrieves index of previous question, and makes a window depending on type  
     def previous_question(self):
         global app
         self.text.place_forget()
         self.entry.place_forget()
-        question = questions.get_previous_question()
+        _,question = questions.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":
@@ -121,12 +122,14 @@ class CategoryWindow(Window):
         self.text.place_forget()
         for box in self.boxes:
             box.place_forget()
-        question = questions.get_next_question()
-        if question.answer_type == "value":
-            app = IntegerWindow(question.question_text)
-        if question.answer_type == "category":
-            app = CategoryWindow(question.question_text, question.possible_answers)
-        self.store_result(question)
+        current_question, next_question = questions.get_next_question()
+        if next_question.answer_type == "value":
+            app = IntegerWindow(next_question.question_text)
+        if next_question.answer_type == "category":
+            app = CategoryWindow(next_question.question_text, next_question.possible_answers)
+        self.store_result(current_question)
+        current_question.print_info()
+
     
     # Retrieves index of previous question, and makes a window depending on type
     def previous_question(self):
@@ -134,7 +137,7 @@ class CategoryWindow(Window):
         self.text.place_forget()
         for box in self.boxes:
             box.place_forget()
-        question = questions.get_previous_question()
+        _,question = questions.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":

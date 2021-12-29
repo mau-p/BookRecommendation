@@ -6,6 +6,10 @@ class Question:
         self.possible_answers = possible_answers # If category: the possible answer categories
         self.answer = None # The answer to the question
 
+    def print_info(self):
+        print(self.question_text)
+        print(self.answer)
+
 # Not an ideal implementation, but does for now
 welcome = Question(None, "welcome", None)
 age_question = Question("How old are you?", "value", None)
@@ -24,10 +28,9 @@ question_ref = 1
 def get_next_question():
     global question_ref
     question_ref += 1
-    return question_list[question_ref-1]
+    return question_list[question_ref-2], question_list[question_ref-1] #returns current and next question
 
 def get_previous_question():
     global question_ref
     question_ref -= 1
     return question_list[question_ref-1]
-
