@@ -2,7 +2,7 @@ import bookmanagement
 import GUI
 
 def main():
-    GUI    
+    GUI.launch_GUI()
 
 
 

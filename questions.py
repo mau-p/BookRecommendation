@@ -6,9 +6,6 @@ class Question:
         self.possible_answers = possible_answers # If category: the possible answer categories
         self.answer = None # The answer to the question
 
-    def print_info(self):
-        print(self.question_text)
-        print(self.answer)
 
 # Not an ideal implementation, but does for now
 welcome = Question(None, "welcome", None)

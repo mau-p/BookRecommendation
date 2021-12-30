@@ -7,10 +7,15 @@ global app
 # Basic properties for all windows
 class Window:
     def __init__(self) -> None:
-        self.geometry = root.geometry("960x600")
+        self.window_width = 960
+        self.widnow_height = 600
+        self.x_pos = root.winfo_screenwidth()/2 - self.window_width/2
+        self.y_pos = root.winfo_screenheight()/2 - self.widnow_height/2
+        self.geometry = root.geometry('%dx%d+%d+%d' % (self.window_width, self.widnow_height, self.x_pos, self.y_pos))
         self.previous = tk.Button(root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
         self.quit = tk.Button(root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
         self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
+
         
 # The window that is displayed when the user first launches the program
 class IntroWindow(Window):
@@ -54,7 +59,6 @@ class IntegerWindow(Window):
         if next_question.answer_type == "category":
             app = CategoryWindow(next_question.question_text, next_question.possible_answers)
         current_question.answer = self.entry.get()
-        current_question.print_info()
 
     # Retrieves index of previous question, and makes a window depending on type  
     def previous_question(self):
@@ -128,7 +132,6 @@ class CategoryWindow(Window):
         if next_question.answer_type == "category":
             app = CategoryWindow(next_question.question_text, next_question.possible_answers)
         self.store_result(current_question)
-        current_question.print_info()
 
     
     # Retrieves index of previous question, and makes a window depending on type
@@ -153,8 +156,11 @@ class CategoryWindow(Window):
                 results.append(self.categories[i])
         question.answer = results
         
+def launch_GUI():
+    return IntroWindow()
+
 
 root = tk.Tk()
 root.title("Book Recommendation")
-app = IntroWindow()
+app = launch_GUI()
 root.mainloop()
