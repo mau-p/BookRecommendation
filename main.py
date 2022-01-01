@@ -1,8 +1,9 @@
+from sqlite3.dbapi2 import Cursor
 import bookmanagement
 import GUI
 
 def main():
-    GUI.launch_GUI()
+    cursor = bookmanagement.get_cursor()
 
 
 
