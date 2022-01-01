@@ -5,18 +5,24 @@ import questions
 global app
 
 # Basic properties for all windows
+
+
 class Window:
     def __init__(self) -> None:
         self.window_width = 960
         self.widnow_height = 600
         self.x_pos = root.winfo_screenwidth()/2 - self.window_width/2
         self.y_pos = root.winfo_screenheight()/2 - self.widnow_height/2
-        self.geometry = root.geometry('%dx%d+%d+%d' % (self.window_width, self.widnow_height, self.x_pos, self.y_pos))
-        self.previous = tk.Button(root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
-        self.quit = tk.Button(root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
-        self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
+        self.geometry = root.geometry(
+            '%dx%d+%d+%d' % (self.window_width, self.widnow_height, self.x_pos, self.y_pos))
+        self.previous = tk.Button(
+            root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
+        self.quit = tk.Button(
+            root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
+        self.next = tk.Button(
+            root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
 
-        
+
 # The window that is displayed when the user first launches the program
 class IntroWindow(Window):
     def __init__(self) -> None:
@@ -32,11 +38,12 @@ class IntroWindow(Window):
     def next_question(self):
         global app
         self.text.place_forget()
-        _,question = questions.get_next_question()
+        _, question = questions.get_next_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":
-            app = CategoryWindow(question.question_text, question.possible_answers)
+            app = CategoryWindow(question.question_text,
+                                 question.possible_answers)
 
 
 # Type of window that asks the user for value (for example their age or a book rating)
@@ -57,23 +64,27 @@ class IntegerWindow(Window):
         if next_question.answer_type == "value":
             app = IntegerWindow(next_question.question_text)
         if next_question.answer_type == "category":
-            app = CategoryWindow(next_question.question_text, next_question.possible_answers)
+            app = CategoryWindow(next_question.question_text,
+                                 next_question.possible_answers)
         current_question.answer = self.entry.get()
 
-    # Retrieves index of previous question, and makes a window depending on type  
+    # Retrieves index of previous question, and makes a window depending on type
     def previous_question(self):
         global app
         self.text.place_forget()
         self.entry.place_forget()
-        _,question = questions.get_previous_question()
+        question = questions.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":
-            app = CategoryWindow(question.question_text, question.possible_answers)
+            app = CategoryWindow(question.question_text,
+                                 question.possible_answers)
         if question.answer_type == "welcome":
             app = IntroWindow()
 
 # Type of window that shows the user different options to choose from (for example gender, yes/no or reading preferences)
+
+
 class CategoryWindow(Window):
     def __init__(self, question: str, categories: list) -> None:
         Window.__init__(self)
@@ -130,21 +141,23 @@ class CategoryWindow(Window):
         if next_question.answer_type == "value":
             app = IntegerWindow(next_question.question_text)
         if next_question.answer_type == "category":
-            app = CategoryWindow(next_question.question_text, next_question.possible_answers)
+            app = CategoryWindow(next_question.question_text,
+                                 next_question.possible_answers)
         self.store_result(current_question)
 
-    
     # Retrieves index of previous question, and makes a window depending on type
+
     def previous_question(self):
         global app
         self.text.place_forget()
         for box in self.boxes:
             box.place_forget()
-        _,question = questions.get_previous_question()
+        question = questions.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text)
         if question.answer_type == "category":
-            app = CategoryWindow(question.question_text, question.possible_answers)
+            app = CategoryWindow(question.question_text,
+                                 question.possible_answers)
         if question.answer_type == "welcome":
             app = IntroWindow()
 
@@ -155,7 +168,8 @@ class CategoryWindow(Window):
             if self.category_variables[i].get() == 1:
                 results.append(self.categories[i])
         question.answer = results
-        
+
+
 def launch_GUI():
     return IntroWindow()
 
