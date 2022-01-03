@@ -13,45 +13,45 @@ welcome = Question(None, "welcome", None)
 age_question = Question("How old are you?", "value", None)
 gender_question = Question("I am a", "category", ["Man", "Woman"])
 like_complex = Question("I enjoy complex language", "category", [
-                        "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+                        "Disagree", "Neutral", "Agree"])
 like_simple_narratives = Question("Complex narratives with many subplots are often too complicate for me to enjoy", "category", [
-                                  "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+                                  "Disagree", "Neutral", "Agree"])
 reading_task = Question("I dont like it if reading feels like a task", "category", [
-                        "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+                        "Disagree", "Neutral", "Agree"])
 regular_reader = Question("I consider myself a regular reader", "category", [
-                          "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+                          "Disagree", "Neutral", "Agree"])
 read_more = Question("I would like to read more books then I currently do", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 humor = Question("I dont mind if a book does not have humoristic elements", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 comedy_v_drama = Question("I generally like comedy over drama", "category", [
-                          "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+                          "Disagree", "Neutral", "Agree"])
 happy_ending = Question("I generally prefer it if stories have a happy ending", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 relax = Question("A main reason I like to read is because it helps me to relax and unwind", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 challenge = Question("I like it if books feel like a challenge", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 social_issues = Question("I often think about social issues", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 history = Question("I generally enjoy history", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 intense = Question("I like intense stories", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 own_life = Question("I prefer books with stories that are similar to my own life", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 leisure_pace = Question("I prefer reading at a leisurely pace", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 real_world = Question("I like books that make me reflect upon the real world", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 mysteries = Question("I enjoy it when there are mysteries in the plot", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 romantic = Question("I would consider myself a romantic person", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 finishing = Question("I don't like not finishing books", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 moody = Question("I dont like it if characters are overly moody and sentimental", "category", [
-    "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
+    "Disagree", "Neutral", "Agree"])
 
 
 # TODO: Find a better implementation of whatever this is.
@@ -80,14 +80,11 @@ question_list.append(romantic)
 question_list.append(finishing)
 question_list.append(moody)
 
-
-def get_question_list():
-    return question_list
-
-
 # Functions for next and previous buttons
 question_ref = 1
 
+def get_question_list_length():
+    return len(question_list)
 
 def get_next_question():
     global question_ref

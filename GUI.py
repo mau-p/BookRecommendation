@@ -4,11 +4,17 @@ import questions
 
 global app
 
+def incrementor():
+    if hasattr(incrementor, "num"):
+        incrementor.num += 1           # increment if not first call
+    else:
+        incrementor.num = 0         # initialize on first call
+    return incrementor.num
+
 # Basic properties for all windows
-
-
 class Window:
     def __init__(self) -> None:
+        self.index = incrementor()
         self.window_width = 960
         self.widnow_height = 600
         self.x_pos = root.winfo_screenwidth()/2 - self.window_width/2
@@ -19,8 +25,10 @@ class Window:
             root, text="Previous", command=lambda: self.previous_question()).place(relx=.1, rely=.9)
         self.quit = tk.Button(
             root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
-        self.next = tk.Button(
-            root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
+        if self.index == questions.get_question_list_length()-1:
+            self.next = tk.Button(root, text="Next", state=DISABLED).place(relx=.85, rely=.9)
+        else:
+            self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
 
 
 # The window that is displayed when the user first launches the program
