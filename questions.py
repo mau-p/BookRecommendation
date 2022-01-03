@@ -12,8 +12,6 @@ class Question:
 welcome = Question(None, "welcome", None)
 age_question = Question("How old are you?", "value", None)
 gender_question = Question("I am a", "category", ["Man", "Woman"])
-readinglevel_question = Question("What is your reading level?", "category", [
-                                 "average", "good", "excellent"])
 like_complex = Question("I enjoy complex language", "category", [
                         "Completely disagree", "Mostly disagree", "Mostly agree", "Completely agree"])
 like_simple_narratives = Question("Complex narratives with many subplots are often too complicate for me to enjoy", "category", [
@@ -61,7 +59,6 @@ question_list = []
 question_list.append(welcome)
 question_list.append(age_question)
 question_list.append(gender_question)
-question_list.append(readinglevel_question)
 question_list.append(like_complex)
 question_list.append(like_simple_narratives)
 question_list.append(reading_task)
