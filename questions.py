@@ -83,6 +83,10 @@ question_list.append(moody)
 # Functions for next and previous buttons
 question_ref = 1
 
+def revert_question():
+    global question_ref
+    question_ref -=1
+
 def get_question_list_length():
     return len(question_list)
 

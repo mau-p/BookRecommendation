@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter.constants import CENTER, DISABLED
 import questions
 
-global app
 
 def incrementor():
     if hasattr(incrementor, "num"):
@@ -12,6 +11,8 @@ def incrementor():
     return incrementor.num
 
 # Basic properties for all windows
+
+
 class Window:
     def __init__(self) -> None:
         self.index = incrementor()
@@ -26,12 +27,15 @@ class Window:
         self.quit = tk.Button(
             root, text="Quit", command=lambda: root.quit()).place(relx=.5, rely=.9)
         if self.index == questions.get_question_list_length()-1:
-            self.next = tk.Button(root, text="Next", state=DISABLED).place(relx=.85, rely=.9)
+            self.next = tk.Button(
+                root, text="Next", state=DISABLED).place(relx=.85, rely=.9)
         else:
-            self.next = tk.Button(root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
-
+            self.next = tk.Button(
+                root, text="Next", command=lambda: self.next_question()).place(relx=.85, rely=.9)
 
 # The window that is displayed when the user first launches the program
+
+
 class IntroWindow(Window):
     def __init__(self) -> None:
         Window.__init__(self)
@@ -99,24 +103,15 @@ class CategoryWindow(Window):
         self.text = tk.Label(root, text=question)
         self.text.place(relx=0.5, rely=.3, anchor=CENTER)
         self.categories = categories
-        self.category_variables = []
         self.boxes = []
-        self.set_category_variables()
-        self.create_checkboxes()
-        self.place_checkboxes()
+        self.checkbox = tk.IntVar(value=0)
+        self.init_checkboxes()
 
-    # Creates an tk.IntVar for each variable, (gets set to 1 if checked)
-    def set_category_variables(self):
+    def init_checkboxes(self):
         for i in range(len(self.categories)):
-            self.category_variables.append(tk.IntVar())
-
-    def create_checkboxes(self):
-        for category, category_variable in zip(self.categories, self.category_variables):
             self.boxes.append(tk.Checkbutton(
-                root, text=category, variable=category_variable))
+                root, text=self.categories[i], onvalue=i+1, variable=self.checkbox))
 
-    # This is terrible, but havent found a better way for now
-    def place_checkboxes(self):
         if len(self.boxes) == 2:
             self.boxes[0].place(relx=.40, rely=.5)
             self.boxes[1].place(relx=.60, rely=.5)
@@ -146,12 +141,18 @@ class CategoryWindow(Window):
         for box in self.boxes:
             box.place_forget()
         current_question, next_question = questions.get_next_question()
+        if self.checkbox.get() == 0:  # Checks if the questions has been answered
+            next_question = current_question
+            questions.revert_question()
+            answer_warning_label = tk.Label(root, text="In order to find your ideal book, we need your answer to this question. \n \
+                If you don't know the answer, you can answer neutral in most cases", fg='red')
+            answer_warning_label.place(relx=0.5, rely=0.1, anchor=CENTER)
+        current_question.answer = self.categories[self.checkbox.get()-1]
         if next_question.answer_type == "value":
             app = IntegerWindow(next_question.question_text)
         if next_question.answer_type == "category":
             app = CategoryWindow(next_question.question_text,
                                  next_question.possible_answers)
-        self.store_result(current_question)
 
     # Retrieves index of previous question, and makes a window depending on type
 
@@ -169,20 +170,8 @@ class CategoryWindow(Window):
         if question.answer_type == "welcome":
             app = IntroWindow()
 
-    # Goes through each of the box variables, if it is 1 (True), it appends the corresponding category to the result.
-    def store_result(self, question):
-        results = []
-        for i in range(len(self.category_variables)):
-            if self.category_variables[i].get() == 1:
-                results.append(self.categories[i])
-        question.answer = results
-
-
-def launch_GUI():
-    return IntroWindow()
-
 
 root = tk.Tk()
 root.title("Book Recommendation")
-app = launch_GUI()
+app = IntroWindow()
 root.mainloop()
