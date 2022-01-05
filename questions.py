@@ -18,10 +18,10 @@ like_simple_narratives = Question("Complex narratives with many subplots are oft
                                   "Disagree", "Neutral", "Agree"])
 reading_task = Question("I dont like it if reading feels like a task", "category", [
                         "Disagree", "Neutral", "Agree"])
-regular_reader = Question("I consider myself a regular reader", "category", [
-                          "Disagree", "Neutral", "Agree"])
-read_more = Question("I would like to read more books then I currently do", "category", [
-    "Disagree", "Neutral", "Agree"])
+#regular_reader = Question("I consider myself a regular reader", "category", [
+#                          "Disagree", "Neutral", "Agree"])
+#read_more = Question("I would like to read more books then I currently do", "category", [
+#    "Disagree", "Neutral", "Agree"])
 humor = Question("I dont mind if a book does not have humoristic elements", "category", [
     "Disagree", "Neutral", "Agree"])
 comedy_v_drama = Question("I generally like comedy over drama", "category", [
@@ -30,8 +30,8 @@ happy_ending = Question("I generally prefer it if stories have a happy ending", 
     "Disagree", "Neutral", "Agree"])
 relax = Question("A main reason I like to read is because it helps me to relax and unwind", "category", [
     "Disagree", "Neutral", "Agree"])
-challenge = Question("I like it if books feel like a challenge", "category", [
-    "Disagree", "Neutral", "Agree"])
+#challenge = Question("I like it if books feel like a challenge", "category", [
+#    "Disagree", "Neutral", "Agree"])
 social_issues = Question("I often think about social issues", "category", [
     "Disagree", "Neutral", "Agree"])
 history = Question("I generally enjoy history", "category", [
@@ -40,13 +40,15 @@ intense = Question("I like intense stories", "category", [
     "Disagree", "Neutral", "Agree"])
 own_life = Question("I prefer books with stories that are similar to my own life", "category", [
     "Disagree", "Neutral", "Agree"])
-leisure_pace = Question("I prefer reading at a leisurely pace", "category", [
-    "Disagree", "Neutral", "Agree"])
+#leisure_pace = Question("I prefer reading at a leisurely pace", "category", [
+#    "Disagree", "Neutral", "Agree"])
 real_world = Question("I like books that make me reflect upon the real world", "category", [
     "Disagree", "Neutral", "Agree"])
 mysteries = Question("I enjoy it when there are mysteries in the plot", "category", [
     "Disagree", "Neutral", "Agree"])
 romantic = Question("I would consider myself a romantic person", "category", [
+    "Disagree", "Neutral", "Agree"])
+keep_reading = Question("I like the feeling of having not being able to stop reading", "category", [
     "Disagree", "Neutral", "Agree"])
 finishing = Question("I don't like not finishing books", "category", [
     "Disagree", "Neutral", "Agree"])
