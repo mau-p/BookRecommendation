@@ -41,8 +41,8 @@ def initialize_questions():
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I would consider myself a romantic person", "category", [
                         "Disagree", "Neutral", "Agree"]))
-    question_list.append("I like the feeling of having not being able to stop reading", "category", [
-                        "Disagree", "Neutral", "Agree"])
+    question_list.append(Question("I like the feeling of having not being able to stop reading", "category", [
+                        "Disagree", "Neutral", "Agree"]))
     question_list.append( Question("I don't like not finishing books", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I dont like it if characters are overly moody and sentimental", "category", [
