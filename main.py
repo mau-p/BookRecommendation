@@ -1,5 +1,6 @@
 import questions
 import GUI
+import rules
 
 def main():
     questions.initialize_questions()
