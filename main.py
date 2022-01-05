@@ -1,12 +1,10 @@
-from sqlite3.dbapi2 import Cursor
-import bookmanagement
+import questions
 import GUI
 import rules
 
 def main():
-    cursor = bookmanagement.get_cursor()
-
-
+    questions.initialize_questions()
+    GUI.launch_GUI()
 
 if __name__=='__main__':
     main()
