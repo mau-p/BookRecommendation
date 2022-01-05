@@ -11,7 +11,7 @@ class Question:
 # Not an ideal implementation, but does for now
 welcome = Question(None, "welcome", None)
 age_question = Question("How old are you?", "value", None)
-gender_question = Question("I am a", "category", ["Man", "Woman"])
+gender_question = Question("I am a", "category", ["Man", "Neutral", "Woman"])
 like_complex = Question("I enjoy complex language", "category", [
                         "Disagree", "Neutral", "Agree"])
 like_simple_narratives = Question("Complex narratives with many subplots are often too complicate for me to enjoy", "category", [
