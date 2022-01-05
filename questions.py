@@ -19,10 +19,6 @@ def initialize_questions():
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I dont like it if reading feels like a task", "category", [
                         "Disagree", "Neutral", "Agree"]))
-    question_list.append(Question("I consider myself a regular reader", "category", [
-                        "Disagree", "Neutral", "Agree"]))
-    question_list.append(Question("I would like to read more books then I currently do", "category", [
-                        "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I dont mind if a book does not have humoristic elements", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I generally like comedy over drama", "category", [
@@ -30,8 +26,6 @@ def initialize_questions():
     question_list.append(Question("I generally prefer it if stories have a happy ending", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("A main reason I like to read is because it helps me to relax and unwind", "category", [
-                        "Disagree", "Neutral", "Agree"]))
-    question_list.append(Question("I like it if books feel like a challenge", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I often think about social issues", "category", [
                         "Disagree", "Neutral", "Agree"]))
@@ -41,14 +35,14 @@ def initialize_questions():
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I prefer books with stories that are similar to my own life", "category", [
                         "Disagree", "Neutral", "Agree"]))
-    question_list.append(Question("I prefer reading at a leisurely pace", "category", [
-                        "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I like books that make me reflect upon the real world", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I enjoy it when there are mysteries in the plot", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I would consider myself a romantic person", "category", [
                         "Disagree", "Neutral", "Agree"]))
+    question_list.append("I like the feeling of having not being able to stop reading", "category", [
+                        "Disagree", "Neutral", "Agree"])
     question_list.append( Question("I don't like not finishing books", "category", [
                         "Disagree", "Neutral", "Agree"]))
     question_list.append(Question("I dont like it if characters are overly moody and sentimental", "category", [
