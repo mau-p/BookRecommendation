@@ -45,8 +45,8 @@ scores = scores.sort()
 
 #ask confirmation questions for the top three books
 #missing: a way for the interface to show the description of the book in question
-question_list.append(Question("Would you see yourself liking this king of story?", "category",["Yes","Neutral", "No"] ))
-question_list.append(Question("Would you see yourself liking this king of story?", "category",["Yes","Neutral", "No"] ))
-question_list.append(Question("Would you see yourself liking this king of story?", "category",["Yes","Neutral", "No"] ))
+question_list.append(Question("Would you see yourself liking this kind of story?", "category",["Yes","Neutral", "No"] ))
+question_list.append(Question("Would you see yourself liking this kind of story?", "category",["Yes","Neutral", "No"] ))
+question_list.append(Question("Would you see yourself liking this kind of story?", "category",["Yes","Neutral", "No"] ))
 
     
