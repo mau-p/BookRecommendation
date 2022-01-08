@@ -31,7 +31,7 @@ class Window:
         self.previous.place(relx=.05, rely=.9)
         self.next = tk.Button(root, text="Next", bg="forest green", activebackground="green yellow", fg=self.text_color,
                               highlightbackground=self.highlight_background, width=10, command=lambda: self.next_slide())
-        if self.index == questions.get_question_list_length()-1:
+        if self.index == len(questions.get_questions)-1:
             self.next.configure(state=DISABLED)
         self.next.place(relx=.85, rely=.9)
         self.no_answer_label1 = tk.Label(

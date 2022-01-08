@@ -55,15 +55,14 @@ def revert_question():
     global question_ref
     question_ref -=1
 
-def get_question_list_length():
-    return len(question_list)
+def get_questions():
+    return question_list
 
 def get_next_question():
     global question_ref
     question_ref += 1
     # returns current and next question
     return question_list[question_ref-2], question_list[question_ref-1]
-
 
 def get_previous_question():
     global question_ref
