@@ -18,13 +18,15 @@ def filter_demographics(cursor, age, gender):
     cursor.execute(sql)
     return cursor.fetchall()
 
+# Returns all properties of a book given an ID
 def get_properties(cursor, ID):
     sql = f"SELECT Gender, Age, ReadingLevel, Entertaining, Romantic, Historic, FeelGood, Funny, Gripping, Sad, Social \
         from BOOK Where ID = {ID}"
     cursor.execute(sql)
     return list(cursor.fetchone())
 
+# Returns Title, Author, ISBN and Summary of book given an ID
 def get_book(cursor, ID):
-    sql = f"SELECT Title, Author, Summary from BOOK Where ID = {ID}"
+    sql = f"SELECT Title, Author, ISBN, Summary from BOOK Where ID = {ID}"
     cursor.execute(sql)
     return list(cursor.fetchone())

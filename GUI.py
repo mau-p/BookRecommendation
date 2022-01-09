@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter.constants import CENTER, DISABLED, INSERT, TOP
 import questions
+import bookmanagement
 
+cursor = bookmanagement.get_cursor()
 
 def incrementor():
     if hasattr(incrementor, "num"):
@@ -31,7 +33,7 @@ class Window:
         self.previous.place(relx=.05, rely=.9)
         self.next = tk.Button(root, text="Next", bg="forest green", activebackground="green yellow", fg=self.text_color,
                               highlightbackground=self.highlight_background, width=10, command=lambda: self.next_slide())
-        if self.index == len(questions.get_questions)-1:
+        if self.index == len(questions.get_questions())-1:
             self.next.configure(state=DISABLED)
         self.next.place(relx=.85, rely=.9)
         self.no_answer_label1 = tk.Label(
@@ -166,6 +168,7 @@ class CategoryWindow(Window):
         self.move_on(next_question, no_answer)
 
 
+# Window used in the final stage where user is presented with a few options
 class SummaryWindow(Window):
     def __init__(self, title: str, author: str, summary: str) -> None:
         Window.__init__(self)
@@ -204,6 +207,37 @@ class SummaryWindow(Window):
         next_question, no_answer = self.check_answer(
             self.checkbox == 0, current_question, next_question)
         self.move_on(next_question, no_answer)
+
+# Final window, the user is presented with their ideal book
+class BookSuggestionWindow(Window):
+    def __init__(self, ID) -> None:
+        Window.__init__(self)
+        book = bookmanagement.get_book(cursor, ID)
+        self.book_title = book[0]
+        self.book_author = book[1]
+        self.book_ISBN = book[2]
+        self.summary = book[3]
+        self.title = tk.Label(root, text=self.book_title, font=(
+            "Arial", 25), bg=self.background_color, fg=self.text_color)
+        self.question = tk.Label(
+            root, text="Say hi to your next favorite book!", bg=self.background_color, fg=self.text_color, font=("Arial", 18))
+        self.author = tk.Label(root, text=f'by {self.book_author}', bg="green3")
+        self.ISBN = tk.Label(root, text=f'ISBN: {self.book_ISBN}', fg=self.text_color, bg=self.background_color, width = 20, font=("Arial", 12))
+        self.textbox = tk.Text(root, height=13, width=110, wrap=tk.WORD)
+        self.textbox.insert(INSERT, self.summary)
+        self.textbox.config(state=DISABLED)
+        self.textbox.place(relx=.5, rely=.7, anchor=CENTER)
+        self.question.place(relx=.5, rely=.15, anchor=CENTER)
+        self.title.place(relx=.5, rely=.25, anchor=CENTER)
+        self.author.place(relx=.5, rely=.30, anchor=CENTER)
+        self.ISBN.place(relx=.41, rely=.35)
+        self.quit = tk.Button(root, text="Done", bg="red3", activebackground="red", highlightbackground=self.highlight_background, fg=self.text_color,
+            width=10, command=lambda: quit())
+        self.quit.place(relx=.45, rely=.9)
+        self.next.destroy()
+        self.previous.destroy()
+
+    
 
 def launch_GUI():
     global root
