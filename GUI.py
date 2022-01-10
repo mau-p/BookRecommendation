@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter.constants import CENTER, DISABLED, INSERT, TOP
 import questions
 import bookmanagement
+import rules
 
 cursor = bookmanagement.get_cursor()
 
@@ -166,6 +167,35 @@ class CategoryWindow(Window):
         current_question, next_question = questions.get_next_question()
         next_question, no_answer = self.check_answer(self.checkbox.get() == 0, current_question, next_question)
         self.move_on(next_question, no_answer)
+
+
+# Window after category questions, explains final summary part and initialises database
+class KnowledgeBaseWindow(Window):
+    def __init__(self) -> None:
+        Window.__init__(self)
+        self.title = tk.Label(root, text="BookRecommendation is about to recommend some books!", font=(
+            'Arial', 30), bg=self.background_color, fg=self.text_color)
+        self.presentation = tk.Label(root, text=("Based on your answers BookRecommendation will show you a few books with their summaries. \n"
+                                                 "Please read the summary and judge whether you would read this book or not. \n"),
+                                     bg=self.background_color, fg=self.text_color, font=("Arial", 12))
+        self.presentation.place(relx=.5, rely=.4, anchor=CENTER)
+        self.title.place(relx=.5, rely=.3, anchor=CENTER)
+        self.previous.configure(state=DISABLED)
+        q_list = questions.get_questions()              # does this obtain the question with the answers?
+        KB = rules.initialise_knowledge_base(q_list)
+        preferences = rules.array_from_categories(KB)   # preferences is an array of 0's, 1's and -1's (same order as database)
+
+    # Retrieves index of next question, and makes a window depending on type
+    def next_slide(self):
+        global app
+        self.title.destroy()
+        self.presentation.destroy()
+        _, question = questions.get_next_question()
+        if question.answer_type == "value":
+            app = IntegerWindow(question.question_text, False)
+        if question.answer_type == "category":
+            app = CategoryWindow(question.question_text,
+                                 question.possible_answers, False)
 
 
 # Window used in the final stage where user is presented with a few options

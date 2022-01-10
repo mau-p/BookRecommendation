@@ -1,8 +1,8 @@
 #   converts answers from the questions into something usable for the Knowledge Base
-def convert_answers(questions_from_GUI):
+def convert_answers(question_list_from_GUI):
 
     answers_as_strings = []
-    for question in questions_from_GUI:
+    for question in question_list_from_GUI:
         q_text, q_type, q_pos_answer, q_answer = question
 
         if q_type == "category" and q_text != "I am a": #python does not have switch statements.exe
@@ -148,7 +148,7 @@ def forward_chaining(KB):
     return KB
 
 # Run after obtaining cursor with Age, Gender and Reading Level
-def initialise_knowledge_base(answers):
+def initialise_knowledge_base(question_list_from_GUI):
 
     KB = {}
     KB["rules"] = [
@@ -250,6 +250,8 @@ def initialise_knowledge_base(answers):
     ]
 
     KB["categories"] = []    
-    KB["questions"] = answers   # should be updated after all questions
+    KB["questions"] = convert_answers(question_list_from_GUI)   # should be updated after all questions
+    
+    KB = forward_chaining(KB)
 
     return KB
