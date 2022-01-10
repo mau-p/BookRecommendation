@@ -3,8 +3,10 @@ def convert_answers(question_list_from_GUI):
 
     answers_as_strings = []
     for question in question_list_from_GUI:
-        q_text, q_type, q_pos_answer, q_answer = question
-
+        q_type = question.answer_type
+        q_text = question.question_text
+        q_answer = question.answer
+    
         if q_type == "category" and q_text != "I am a": #python does not have switch statements.exe
             if q_text == "I enjoy complex language":
                 string = "like_complex "
@@ -253,5 +255,5 @@ def initialise_knowledge_base(question_list_from_GUI):
     KB["questions"] = convert_answers(question_list_from_GUI)   # should be updated after all questions
     
     KB = forward_chaining(KB)
-
+    KB = array_from_categories(KB)
     return KB

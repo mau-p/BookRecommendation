@@ -3,8 +3,10 @@ from tkinter.constants import CENTER, DISABLED, INSERT, TOP
 import questions
 import bookmanagement
 import rules
+import bookselect
 
 cursor = bookmanagement.get_cursor()
+
 
 def incrementor():
     if hasattr(incrementor, "num"):
@@ -29,24 +31,32 @@ class Window:
         self.geometry = root.geometry(
             '%dx%d+%d+%d' % (self.window_width, self.window_height, self.x_pos, self.y_pos))
         self.previous = tk.Button(
-            root, text="Previous", bg="red3", activebackground="red", highlightbackground=self.highlight_background, fg=self.text_color,
-            width=10, command=lambda: self.go_back())
+            root, text="Previous", bg="red3", activebackground="red", highlightbackground=self.highlight_background,
+            fg=self.text_color, width=10, command=lambda: self.go_back())
         self.previous.place(relx=.05, rely=.9)
         self.next = tk.Button(root, text="Next", bg="forest green", activebackground="green yellow", fg=self.text_color,
                               highlightbackground=self.highlight_background, width=10, command=lambda: self.next_slide())
-        if self.index == len(questions.get_questions())-1:
-            self.next.configure(state=DISABLED)
+        # if self.index == len(questions.get_questions())-1:
+        #   self.next.configure(state=DISABLED)
         self.next.place(relx=.85, rely=.9)
         self.no_answer_label1 = tk.Label(
             root, text="In order to find your ideal book, we need your answer to this question", fg='red', font=("Arial", 15))
 
     def move_on(self, next_question, no_answer):
         global app
+        self.next.destroy()
+        self.previous.destroy()
         if next_question.answer_type == "value":
             app = IntegerWindow(next_question.question_text, no_answer)
-        if next_question.answer_type == "category":
+        elif next_question.answer_type == "category":
             app = CategoryWindow(next_question.question_text,
                                  next_question.possible_answers, no_answer)
+        elif next_question.answer_type == "knowledgebase":
+            app = KnowledgeBaseWindow()
+        elif next_question.answer_type == "summarywindow":
+            app = SummaryWindow(int(next_question.possible_answers))
+        elif next_question.answer_type == "suggestion":
+            app = SuggestionWindow(int(next_question.possible_answers))
 
     def go_back(self):
         global app
@@ -57,8 +67,14 @@ class Window:
         if question.answer_type == "category":
             app = CategoryWindow(question.question_text,
                                  question.possible_answers, False)
-        if question.answer_type == "welcome":
+        elif question.answer_type == "welcome":
             app = IntroWindow()
+        elif question.answer_type == "knowledgebase":
+            app = KnowledgeBaseWindow()
+        elif question.answer_type == "summarywindow":
+            app = SummaryWindow(int(question.possible_answers))
+        elif question.answer_type == "suggestion":
+            app = SuggestionWindow(int(question.possible_answers))
 
     def check_answer(self, wrong_answer: bool, current_question, next_question):
         if wrong_answer:
@@ -88,6 +104,8 @@ class IntroWindow(Window):
         global app
         self.title.destroy()
         self.presentation.destroy()
+        self.next.destroy()
+        self.previous.destroy()
         _, question = questions.get_next_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text, False)
@@ -165,7 +183,9 @@ class CategoryWindow(Window):
         global app
         self.destroy_window()
         current_question, next_question = questions.get_next_question()
-        next_question, no_answer = self.check_answer(self.checkbox.get() == 0, current_question, next_question)
+        current_question.answer = self.categories[self.checkbox.get()-1]
+        next_question, no_answer = self.check_answer(
+            self.checkbox.get() == 0, current_question, next_question)
         self.move_on(next_question, no_answer)
 
 
@@ -174,16 +194,18 @@ class KnowledgeBaseWindow(Window):
     def __init__(self) -> None:
         Window.__init__(self)
         self.title = tk.Label(root, text="BookRecommendation is about to recommend some books!", font=(
-            'Arial', 30), bg=self.background_color, fg=self.text_color)
+            'Arial', 25), bg=self.background_color, fg=self.text_color)
         self.presentation = tk.Label(root, text=("Based on your answers BookRecommendation will show you a few books with their summaries. \n"
                                                  "Please read the summary and judge whether you would read this book or not. \n"),
                                      bg=self.background_color, fg=self.text_color, font=("Arial", 12))
         self.presentation.place(relx=.5, rely=.4, anchor=CENTER)
         self.title.place(relx=.5, rely=.3, anchor=CENTER)
         self.previous.configure(state=DISABLED)
-        q_list = questions.get_questions()              # does this obtain the question with the answers?
+        # does this obtain the question with the answers?
+        q_list = questions.get_questions()
         KB = rules.initialise_knowledge_base(q_list)
-        preferences = rules.array_from_categories(KB)   # preferences is an array of 0's, 1's and -1's (same order as database)
+        # preferences is an array of 0's, 1's and -1's (same order as database)
+        bookselect.get_recommendations(KB)
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
@@ -191,22 +213,23 @@ class KnowledgeBaseWindow(Window):
         self.title.destroy()
         self.presentation.destroy()
         _, question = questions.get_next_question()
-        if question.answer_type == "value":
-            app = IntegerWindow(question.question_text, False)
-        if question.answer_type == "category":
-            app = CategoryWindow(question.question_text,
-                                 question.possible_answers, False)
+        self.move_on(question, False)
 
 
 # Window used in the final stage where user is presented with a few options
 class SummaryWindow(Window):
-    def __init__(self, title: str, author: str, summary: str) -> None:
+    def __init__(self, ID) -> None:
         Window.__init__(self)
+        self.book_ID = ID
+        book = bookmanagement.get_book(cursor, ID)
+        book_title = book[0]
+        book_author = book[1]
+        summary = book[3]
         self.question = tk.Label(
             root, text="What do you think about this book?", bg=self.background_color, fg=self.text_color, font=("Arial", 14))
-        self.title = tk.Label(root, text=title, font=(
+        self.title = tk.Label(root, text=book_title, font=(
             "Arial", 25), bg=self.background_color, fg=self.text_color)
-        self.author = tk.Label(root, text=f'by {author}', bg="green2")
+        self.author = tk.Label(root, text=f'by {book_author}', bg="green2")
         self.textbox = tk.Text(root, height=13, width=110, wrap=tk.WORD)
         self.textbox.insert(INSERT, summary)
         self.textbox.config(state=DISABLED)
@@ -217,7 +240,7 @@ class SummaryWindow(Window):
         self.checkbox = tk.IntVar()
         self.would = tk.Checkbutton(root, text="I would read this", onvalue=1, variable=self.checkbox, width=20, height=2,
                                     highlightbackground=self.highlight_background)
-        self.would_not = tk.Checkbutton(root, text="I would not read this", onvalue=1, variable=self.checkbox, width=20, height=2,
+        self.would_not = tk.Checkbutton(root, text="I would not read this", onvalue=-1, variable=self.checkbox, width=20, height=2,
                                         highlightbackground=self.highlight_background)
         self.would_not.place(relx=.25, rely=.75)
         self.would.place(relx=.55, rely=.75)
@@ -233,13 +256,20 @@ class SummaryWindow(Window):
     def next_slide(self):
         global app
         self.destroy_window()
+        if self.checkbox.get() == 1:
+            questions.possible_last_books(self.book_ID)
         current_question, next_question = questions.get_next_question()
+        if current_question == next_question:
+            questions.append_last_book()
+            current_question, next_question = questions.get_next_question()
         next_question, no_answer = self.check_answer(
             self.checkbox == 0, current_question, next_question)
         self.move_on(next_question, no_answer)
 
 # Final window, the user is presented with their ideal book
-class BookSuggestionWindow(Window):
+
+
+class SuggestionWindow(Window):
     def __init__(self, ID) -> None:
         Window.__init__(self)
         book = bookmanagement.get_book(cursor, ID)
@@ -251,8 +281,10 @@ class BookSuggestionWindow(Window):
             "Arial", 25), bg=self.background_color, fg=self.text_color)
         self.question = tk.Label(
             root, text="Say hi to your next favorite book!", bg=self.background_color, fg=self.text_color, font=("Arial", 18))
-        self.author = tk.Label(root, text=f'by {self.book_author}', bg="green3")
-        self.ISBN = tk.Label(root, text=f'ISBN: {self.book_ISBN}', fg=self.text_color, bg=self.background_color, width = 20, font=("Arial", 12))
+        self.author = tk.Label(
+            root, text=f'by {self.book_author}', bg="green3")
+        self.ISBN = tk.Label(root, text=f'ISBN: {self.book_ISBN}', fg=self.text_color,
+                             bg=self.background_color, width=20, font=("Arial", 12))
         self.textbox = tk.Text(root, height=13, width=110, wrap=tk.WORD)
         self.textbox.insert(INSERT, self.summary)
         self.textbox.config(state=DISABLED)
@@ -262,12 +294,11 @@ class BookSuggestionWindow(Window):
         self.author.place(relx=.5, rely=.30, anchor=CENTER)
         self.ISBN.place(relx=.41, rely=.35)
         self.quit = tk.Button(root, text="Done", bg="red3", activebackground="red", highlightbackground=self.highlight_background, fg=self.text_color,
-            width=10, command=lambda: quit())
+                              width=10, command=lambda: quit())
         self.quit.place(relx=.45, rely=.9)
         self.next.destroy()
         self.previous.destroy()
 
-    
 
 def launch_GUI():
     global root
@@ -276,4 +307,3 @@ def launch_GUI():
     root.title("Book Recommendation")
     app = IntroWindow()
     root.mainloop()
-    
