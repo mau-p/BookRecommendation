@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter.constants import CENTER, DISABLED, INSERT, TOP
-import questions
 import bookmanagement
 import rules
 import bookselect
-
+from quizmaster import quizmaster
 cursor = bookmanagement.get_cursor()
 
 
@@ -36,8 +35,6 @@ class Window:
         self.previous.place(relx=.05, rely=.9)
         self.next = tk.Button(root, text="Next", bg="forest green", activebackground="green yellow", fg=self.text_color,
                               highlightbackground=self.highlight_background, width=10, command=lambda: self.next_slide())
-        # if self.index == len(questions.get_questions())-1:
-        #   self.next.configure(state=DISABLED)
         self.next.place(relx=.85, rely=.9)
         self.no_answer_label1 = tk.Label(
             root, text="In order to find your ideal book, we need your answer to this question", fg='red', font=("Arial", 15))
@@ -61,7 +58,7 @@ class Window:
     def go_back(self):
         global app
         self.destroy_window()
-        question = questions.get_previous_question()
+        question = quizmaster.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text, False)
         if question.answer_type == "category":
@@ -80,7 +77,7 @@ class Window:
         if wrong_answer:
             no_answer = True
             next_question = current_question
-            questions.revert_question()
+            quizmaster.revert_question()
         else:
             no_answer = False
         return next_question, no_answer
@@ -101,17 +98,10 @@ class IntroWindow(Window):
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
-        global app
         self.title.destroy()
         self.presentation.destroy()
-        self.next.destroy()
-        self.previous.destroy()
-        _, question = questions.get_next_question()
-        if question.answer_type == "value":
-            app = IntegerWindow(question.question_text, False)
-        if question.answer_type == "category":
-            app = CategoryWindow(question.question_text,
-                                 question.possible_answers, False)
+        _, question = quizmaster.get_next_question()
+        self.move_on(question, False)
 
 
 # Type of window that asks the user for value (for example their age or a book rating)
@@ -129,15 +119,13 @@ class IntegerWindow(Window):
             self.no_answer_label1.pack(side=TOP)
 
     def destroy_window(self):
-        global app
         self.text.destroy()
         self.entry.destroy()
         self.no_answer_label1.destroy()
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
-        global app
-        current_question, next_question = questions.get_next_question()
+        current_question, next_question = quizmaster.get_next_question()
         current_question.answer = int(self.entry.get())
         next_question, no_answer = self.check_answer(current_question.answer < 0 or type(
             current_question.answer) is not int, current_question, next_question)
@@ -180,9 +168,8 @@ class CategoryWindow(Window):
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
-        global app
         self.destroy_window()
-        current_question, next_question = questions.get_next_question()
+        current_question, next_question = quizmaster.get_next_question()
         current_question.answer = self.categories[self.checkbox.get()-1]
         next_question, no_answer = self.check_answer(
             self.checkbox.get() == 0, current_question, next_question)
@@ -202,17 +189,16 @@ class KnowledgeBaseWindow(Window):
         self.title.place(relx=.5, rely=.3, anchor=CENTER)
         self.previous.configure(state=DISABLED)
         # does this obtain the question with the answers?
-        q_list = questions.get_questions()
+        q_list = quizmaster.get_questions()
         KB = rules.initialise_knowledge_base(q_list)
         # preferences is an array of 0's, 1's and -1's (same order as database)
         bookselect.get_recommendations(KB)
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
-        global app
         self.title.destroy()
         self.presentation.destroy()
-        _, question = questions.get_next_question()
+        _, question = quizmaster.get_next_question()
         self.move_on(question, False)
 
 
@@ -254,14 +240,13 @@ class SummaryWindow(Window):
         self.author.destroy()
 
     def next_slide(self):
-        global app
         self.destroy_window()
         if self.checkbox.get() == 1:
-            questions.possible_last_books(self.book_ID)
-        current_question, next_question = questions.get_next_question()
+            quizmaster.possible_last_books(self.book_ID)
+        current_question, next_question = quizmaster.get_next_question()
         if current_question == next_question:
-            questions.append_last_book()
-            current_question, next_question = questions.get_next_question()
+            quizmaster.append_last_book()
+            current_question, next_question = quizmaster.get_next_question()
         next_question, no_answer = self.check_answer(
             self.checkbox == 0, current_question, next_question)
         self.move_on(next_question, no_answer)

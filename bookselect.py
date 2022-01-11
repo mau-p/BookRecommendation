@@ -1,12 +1,12 @@
 import bookmanagement
-import questions
+from quizmaster import quizmaster
 
 def get_recommendations(preferences):
 
     cursor = bookmanagement.get_cursor()
     scores = []
 
-    question_list = questions.get_questions()
+    question_list = quizmaster.get_questions()
 
 
     for ID in range(1,bookmanagement.count_books(cursor)+1):
@@ -36,4 +36,4 @@ def get_recommendations(preferences):
 
     scores.sort(key=lambda x: x[0], reverse=True)
     scores = scores[0:3]
-    questions.append_recommendations([x[1] for x in scores])
+    quizmaster.append_recommendations([x[1] for x in scores])
