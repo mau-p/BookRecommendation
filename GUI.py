@@ -6,7 +6,6 @@ import bookselect
 from quizmaster import quizmaster
 cursor = bookmanagement.get_cursor()
 
-
 def incrementor():
     if hasattr(incrementor, "num"):
         incrementor.num += 1           # increment if not first call
@@ -41,23 +40,30 @@ class Window:
 
     def move_on(self, next_question, no_answer):
         global app
+        global progress_var
         self.next.destroy()
         self.previous.destroy()
+        progress_var += 1
         if next_question.answer_type == "value":
             app = IntegerWindow(next_question.question_text, no_answer)
         elif next_question.answer_type == "category":
             app = CategoryWindow(next_question.question_text,
                                  next_question.possible_answers, no_answer)
         elif next_question.answer_type == "knowledgebase":
+            q_list = quizmaster.get_questions()
+            KB = rules.initialise_knowledge_base(q_list)
+            bookselect.get_recommendations(KB)
             app = KnowledgeBaseWindow()
         elif next_question.answer_type == "summarywindow":
-            app = SummaryWindow(int(next_question.possible_answers))
+            app = SummaryWindow(next_question.possible_answers, no_answer)
         elif next_question.answer_type == "suggestion":
             app = SuggestionWindow(int(next_question.possible_answers))
 
     def go_back(self):
         global app
+        global progress_var
         self.destroy_window()
+        progress_var -= 1
         question = quizmaster.get_previous_question()
         if question.answer_type == "value":
             app = IntegerWindow(question.question_text, False)
@@ -67,16 +73,20 @@ class Window:
         elif question.answer_type == "welcome":
             app = IntroWindow()
         elif question.answer_type == "knowledgebase":
+            quizmaster.pop_possible_last_books()
             app = KnowledgeBaseWindow()
         elif question.answer_type == "summarywindow":
-            app = SummaryWindow(int(question.possible_answers))
+            quizmaster.pop_possible_last_books()
+            app = SummaryWindow(question.possible_answers, False)
         elif question.answer_type == "suggestion":
             app = SuggestionWindow(int(question.possible_answers))
 
     def check_answer(self, wrong_answer: bool, current_question, next_question):
+        global progress_var
         if wrong_answer:
             no_answer = True
             next_question = current_question
+            progress_var -= 1
             quizmaster.revert_question()
         else:
             no_answer = False
@@ -115,11 +125,16 @@ class IntegerWindow(Window):
             root, width=5, highlightbackground=self.highlight_background, justify=CENTER)
         self.entry.insert(2, 20)
         self.entry.place(relx=.5, rely=.5, anchor=CENTER)
+        string = 'Question', progress_var, ' of 19'
+        self.progress = tk.Label(root, text= string, bg=self.background_color,
+                            fg=self.text_color, font=("Arial", 14))
+        self.progress.place(relx=.45, rely=.9)
         if no_answer:
             self.no_answer_label1.pack(side=TOP)
 
     def destroy_window(self):
         self.text.destroy()
+        self.progress.destroy()
         self.entry.destroy()
         self.no_answer_label1.destroy()
 
@@ -144,6 +159,10 @@ class CategoryWindow(Window):
         self.boxes = []
         self.checkbox = tk.IntVar(value=0)
         self.init_checkboxes()
+        string = 'Question', progress_var, ' of 19'
+        self.progress = tk.Label(root, text= string, bg=self.background_color,
+                            fg=self.text_color, font=("Arial", 14))
+        self.progress.place(relx=.45, rely=.9)
         if no_answer:
             self.no_answer_label1.pack(side=TOP)
 
@@ -162,6 +181,7 @@ class CategoryWindow(Window):
 
     def destroy_window(self):
         self.text.destroy()
+        self.progress.destroy()
         self.no_answer_label1.pack_forget()
         for box in self.boxes:
             box.destroy()
@@ -188,11 +208,6 @@ class KnowledgeBaseWindow(Window):
         self.presentation.place(relx=.5, rely=.4, anchor=CENTER)
         self.title.place(relx=.5, rely=.3, anchor=CENTER)
         self.previous.configure(state=DISABLED)
-        # does this obtain the question with the answers?
-        q_list = quizmaster.get_questions()
-        KB = rules.initialise_knowledge_base(q_list)
-        # preferences is an array of 0's, 1's and -1's (same order as database)
-        bookselect.get_recommendations(KB)
 
     # Retrieves index of next question, and makes a window depending on type
     def next_slide(self):
@@ -204,7 +219,7 @@ class KnowledgeBaseWindow(Window):
 
 # Window used in the final stage where user is presented with a few options
 class SummaryWindow(Window):
-    def __init__(self, ID) -> None:
+    def __init__(self, ID, no_answer:bool) -> None:
         Window.__init__(self)
         self.book_ID = ID
         book = bookmanagement.get_book(cursor, ID)
@@ -230,14 +245,17 @@ class SummaryWindow(Window):
                                         highlightbackground=self.highlight_background)
         self.would_not.place(relx=.25, rely=.75)
         self.would.place(relx=.55, rely=.75)
+        if no_answer:
+            self.no_answer_label1.pack(side=TOP)
 
     def destroy_window(self):
         self.question.destroy()
         self.title.destroy()
         self.textbox.destroy()
-        self.would.place()
+        self.would.destroy()
         self.would_not.destroy()
         self.author.destroy()
+        self.no_answer_label1.pack_forget()
 
     def next_slide(self):
         self.destroy_window()
@@ -248,7 +266,7 @@ class SummaryWindow(Window):
             quizmaster.append_last_book()
             current_question, next_question = quizmaster.get_next_question()
         next_question, no_answer = self.check_answer(
-            self.checkbox == 0, current_question, next_question)
+            self.checkbox.get() == 0, current_question, next_question)
         self.move_on(next_question, no_answer)
 
 # Final window, the user is presented with their ideal book
@@ -257,15 +275,23 @@ class SummaryWindow(Window):
 class SuggestionWindow(Window):
     def __init__(self, ID) -> None:
         Window.__init__(self)
-        book = bookmanagement.get_book(cursor, ID)
-        self.book_title = book[0]
-        self.book_author = book[1]
-        self.book_ISBN = book[2]
-        self.summary = book[3]
+        if ID == 0:
+            self.book_title = '-'
+            self.book_author = '-'
+            self.book_ISBN = '-'
+            self.summary = ' '
+            string = "No book suited your interests, maybe try again!"
+        else:
+            book = bookmanagement.get_book(cursor, ID)
+            self.book_title = book[0]
+            self.book_author = book[1]
+            self.book_ISBN = book[2]
+            self.summary = book[3]
+            string = "Say hi to your next favorite book!"
         self.title = tk.Label(root, text=self.book_title, font=(
             "Arial", 25), bg=self.background_color, fg=self.text_color)
         self.question = tk.Label(
-            root, text="Say hi to your next favorite book!", bg=self.background_color, fg=self.text_color, font=("Arial", 18))
+            root, text=string, bg=self.background_color, fg=self.text_color, font=("Arial", 18))
         self.author = tk.Label(
             root, text=f'by {self.book_author}', bg="green3")
         self.ISBN = tk.Label(root, text=f'ISBN: {self.book_ISBN}', fg=self.text_color,
@@ -288,6 +314,8 @@ class SuggestionWindow(Window):
 def launch_GUI():
     global root
     global app
+    global progress_var
+    progress_var = 0
     root = tk.Tk()
     root.title("Book Recommendation")
     app = IntroWindow()

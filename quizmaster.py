@@ -12,8 +12,15 @@ class Quizmaster:
             self.question_list.append(Question(None, 'summarywindow', option))
 
     def append_last_book(self):
-        self.question_list.append(
-            Question(None, "suggestion", self.final_books[0]))
+        if len(self.final_books) < 1:
+            self.question_list.append(Question(None, "suggestion", 0))
+        else:
+            self.question_list.append(
+                Question(None, "suggestion", self.final_books[0]))
+    
+    def pop_possible_last_books(self):
+        if len(self.final_books) > 0:
+            self.final_books.pop()
 
     def possible_last_books(self, ID):
         self.final_books.append(ID)
