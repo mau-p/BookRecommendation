@@ -51,8 +51,8 @@ class Window:
                                  next_question.possible_answers, no_answer)
         elif next_question.answer_type == "knowledgebase":
             q_list = quizmaster.get_questions()
-            KB = rules.initialise_knowledge_base(q_list)
-            bookselect.get_recommendations(KB)
+            preferences = rules.initialise_knowledge_base(q_list)
+            bookselect.get_recommendations(preferences)
             app = KnowledgeBaseWindow()
         elif next_question.answer_type == "summarywindow":
             app = SummaryWindow(next_question.possible_answers, no_answer)
@@ -281,6 +281,7 @@ class SuggestionWindow(Window):
             self.book_ISBN = '-'
             self.summary = ' '
             string = "No book suited your interests, maybe try again!"
+            inference = "-"
         else:
             book = bookmanagement.get_book(cursor, ID)
             self.book_title = book[0]
@@ -288,6 +289,25 @@ class SuggestionWindow(Window):
             self.book_ISBN = book[2]
             self.summary = book[3]
             string = "Say hi to your next favorite book!"
+
+            # Inference part, tells user which categories they liked and what the recommendation was based on
+            book_categories = bookmanagement.get_properties(cursor, ID)
+            inference = "" 
+            q_list = quizmaster.get_questions()
+            preferences = rules.initialise_knowledge_base(q_list)
+            categories = ["(Entertaining) ", "(Suspense) ", "(Romantic) ", "(Historic) ", "(Feel good) ", 
+                            "(Funny) ", "(Gripping) ", "(Sad) ", "(Social) "]
+            if book_categories[0] == q_list[2].answer:
+                inference += "(Gender) "
+            if book_categories[1] <= q_list[1].answer:
+                inference += "(Age) "
+            if book_categories[2]-2 <= preferences[0]:
+                inference += "(Reading level) "
+            for i in range(1, len(preferences)):
+                if preferences[i] == 1 and book_categories[i+2] == 1:
+                    inference += categories[i-1]
+            inference = "The recommendation was based on the inference of the following:\n" + inference
+
         self.title = tk.Label(root, text=self.book_title, font=(
             "Arial", 25), bg=self.background_color, fg=self.text_color)
         self.question = tk.Label(
@@ -296,6 +316,7 @@ class SuggestionWindow(Window):
             root, text=f'by {self.book_author}', bg="green3")
         self.ISBN = tk.Label(root, text=f'ISBN: {self.book_ISBN}', fg=self.text_color,
                              bg=self.background_color, width=20, font=("Arial", 12))
+        self.infer = tk.Label(root, text=(inference), fg=self.text_color, bg=self.background_color, font=("Arial", 12))
         self.textbox = tk.Text(root, height=13, width=110, wrap=tk.WORD)
         self.textbox.insert(INSERT, self.summary)
         self.textbox.config(state=DISABLED)
@@ -304,6 +325,7 @@ class SuggestionWindow(Window):
         self.title.place(relx=.5, rely=.25, anchor=CENTER)
         self.author.place(relx=.5, rely=.30, anchor=CENTER)
         self.ISBN.place(relx=.41, rely=.35)
+        self.infer.place(relx=.5, rely=.42, anchor=CENTER)
         self.quit = tk.Button(root, text="Done", bg="red3", activebackground="red", highlightbackground=self.highlight_background, fg=self.text_color,
                               width=10, command=lambda: quit())
         self.quit.place(relx=.45, rely=.9)

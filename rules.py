@@ -255,5 +255,5 @@ def initialise_knowledge_base(question_list_from_GUI):
     KB["questions"] = convert_answers(question_list_from_GUI)   # should be updated after all questions
     
     KB = forward_chaining(KB)
-    KB = array_from_categories(KB)
-    return KB
+    pref = array_from_categories(KB)
+    return pref
