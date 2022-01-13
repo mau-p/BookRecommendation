@@ -6,14 +6,6 @@ import bookselect
 from quizmaster import quizmaster
 cursor = bookmanagement.get_cursor()
 
-def incrementor():
-    if hasattr(incrementor, "num"):
-        incrementor.num += 1           # increment if not first call
-    else:
-        incrementor.num = 0         # initialize on first call
-    return incrementor.num
-
-
 # Basic properties for all windows
 class Window:
     def __init__(self) -> None:
@@ -21,7 +13,6 @@ class Window:
         self.highlight_background = "black"
         self.text_color = "grey99"
         root.configure(bg=self.background_color)
-        self.index = incrementor()
         self.window_width = 960
         self.window_height = 600
         self.x_pos = root.winfo_screenwidth()/2 - self.window_width/2
