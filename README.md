@@ -8,5 +8,5 @@ The system asks multiple questions about reading preferences, and uses forward c
 
 ## Running BookRecommendation
 1. Clone the repository and run main.py
-2. Run the executable BookRecommendation from the latest repository. 
+2. Run the executable BookRecommendation from the latest release. 
 
