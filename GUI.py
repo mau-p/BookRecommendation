@@ -48,7 +48,7 @@ class Window:
         elif next_question.answer_type == "summarywindow":
             app = SummaryWindow(next_question.possible_answers, no_answer)
         elif next_question.answer_type == "suggestion":
-            app = SuggestionWindow(next_question.possible_answers, no_answer)
+            app = SuggestionWindow(int(next_question.possible_answers))
 
     def go_back(self):
         global app
@@ -70,7 +70,7 @@ class Window:
             quizmaster.pop_possible_last_books()
             app = SummaryWindow(question.possible_answers, False)
         elif question.answer_type == "suggestion":
-            app = SuggestionWindow(question.possible_answers, False)
+            app = SuggestionWindow(int(question.possible_answers))
 
     def check_answer(self, wrong_answer: bool, current_question, next_question):
         global progress_var
@@ -264,7 +264,7 @@ class SummaryWindow(Window):
 
 
 class SuggestionWindow(Window):
-    def __init__(self, ID, no_answer:bool) -> None:
+    def __init__(self, ID) -> None:
         Window.__init__(self)
         if ID == 0:
             self.book_title = '-'
@@ -320,22 +320,8 @@ class SuggestionWindow(Window):
         self.quit = tk.Button(root, text="Done", bg="red3", activebackground="red", highlightbackground=self.highlight_background, fg=self.text_color,
                               width=10, command=lambda: quit())
         self.quit.place(relx=.45, rely=.9)
-        self.next.configure(state=DISABLED)
-        self.previous.configure(state=DISABLED)
-
-    def destroy_window(self):
-        self.question.destroy()
-        self.title.destroy()
-        self.textbox.destroy()
-        self.author.destroy()
-        self.ISBN.destroy()
-        self.infer.destroy()
-        self.quit.destroy()
-
-    def next_slide(self):
-        self.destroy_window()
-        current_question, next_question = quizmaster.get_next_question()
-        self.move_on(next_question, 0)
+        self.next.destroy()
+        self.previous.destroy()
 
 
 def launch_GUI():
